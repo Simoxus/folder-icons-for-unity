@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Lighting Mapping
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: 2d138fc00f5cf6c4ca2c92d655c4f78e, type: 3}
-  tintDefaultIcon: 0
-  defaultIconTint: {r: 1, g: 1, b: 1, a: 1}
-  folderNames: []
-  folderPaths:
-  - Assets/_Project/Lighting
+  builtInIconName: 
+  folderColor: {r: 1, g: 1, b: 1, a: 1}
+  folderNames:
+  - Lighting
+  folderPaths: []

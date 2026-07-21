@@ -17,6 +17,4 @@ MonoBehaviour:
   folderColor: {r: 1, g: 1, b: 1, a: 1}
   folderNames:
   - Materials
-  folderPaths:
-  - Assets/_Project/Materials
-  - Assets/_Project/NPCs/Humans/Guard/Materials
+  folderPaths: []

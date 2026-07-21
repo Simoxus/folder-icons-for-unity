@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Shaders Mapping
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: 6c8950cbba1af5c44b9b41ea6b4a4384, type: 3}
-  tintDefaultIcon: 0
-  defaultIconTint: {r: 1, g: 1, b: 1, a: 1}
-  folderNames: []
-  folderPaths:
-  - Assets/_Project/Shaders
+  builtInIconName: 
+  folderColor: {r: 1, g: 1, b: 1, a: 1}
+  folderNames:
+  - Shaders
+  - ShaderLibrary
+  folderPaths: []
+  excludeFolderPaths: []

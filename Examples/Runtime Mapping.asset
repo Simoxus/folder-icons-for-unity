@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: 19b4fea80110f7d4eaf3cd1180b58559, type: 3}
   builtInIconName: 
-  tintDefaultIcon: 0
-  defaultIconTint: {r: 1, g: 1, b: 1, a: 1}
+  folderColor: {r: 1, g: 1, b: 1, a: 1}
   folderNames:
-  - Runtime
+  - '*Runtime*'
   folderPaths: []
+  excludeFolderPaths: []

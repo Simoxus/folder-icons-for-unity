@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Items Mapping
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: 30a5c95b1df1a4b4db3b845dafc45960, type: 3}
-  tintDefaultIcon: 0
-  defaultIconTint: {r: 1, g: 1, b: 1, a: 1}
-  folderNames: []
-  folderPaths:
-  - Assets/_Project/Items
+  builtInIconName: 
+  folderColor: {r: 1, g: 1, b: 1, a: 1}
+  folderNames:
+  - Items
+  folderPaths: []

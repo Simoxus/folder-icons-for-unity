@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Features Mapping
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: 84dea29f1106d6a41a63a6a3376b32b0, type: 3}
-  tintDefaultIcon: 0
-  defaultIconTint: {r: 1, g: 1, b: 1, a: 1}
-  folderNames: []
-  folderPaths:
-  - Assets/_Project/Features
+  builtInIconName: 
+  folderColor: {r: 1, g: 1, b: 1, a: 1}
+  folderNames:
+  - Features
+  - _Features
+  folderPaths: []

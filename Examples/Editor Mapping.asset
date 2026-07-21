@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: a8393da58fb7b6a479076dc6a6dff1dc, type: 3}
   builtInIconName: 
-  tintDefaultIcon: 0
-  defaultIconTint: {r: 1, g: 1, b: 1, a: 1}
+  folderColor: {r: 1, g: 1, b: 1, a: 1}
   folderNames:
-  - Editor
+  - '*Editor*'
   folderPaths: []
+  excludeFolderPaths: []

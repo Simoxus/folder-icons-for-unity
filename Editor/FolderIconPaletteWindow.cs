@@ -92,7 +92,7 @@ public class FolderIconPaletteWindow : EditorWindow
         _packageIcons = FolderIconLibrary.GetPackageIcons();
         _builtInIcons = FolderIconLibrary.GetBuiltInIcons();
 
-        _mapping = FindExistingMapping(_folderName);
+        _mapping = FolderIconLibrary.FindMatchingMapping(_folderPath, _folderName);
 
         if (_mapping != null)
         {
@@ -111,22 +111,6 @@ public class FolderIconPaletteWindow : EditorWindow
                 _selectedPackageIcon = _mapping.icon;
             }
         }
-    }
-
-    private static FolderIconMapping FindExistingMapping(string folderName)
-    {
-        string targetName = $"{folderName} Mapping";
-
-        foreach (string guid in AssetDatabase.FindAssets("t:FolderIconMapping"))
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            if (string.Equals(Path.GetFileNameWithoutExtension(path), targetName, System.StringComparison.OrdinalIgnoreCase))
-            {
-                return AssetDatabase.LoadAssetAtPath<FolderIconMapping>(path);
-            }
-        }
-
-        return null;
     }
 
     private void OnGUI()

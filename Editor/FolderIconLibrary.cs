@@ -61,6 +61,27 @@ public static class FolderIconLibrary
         return false;
     }
 
+    // Finds the mapping asset that would match this folder (by path, name, or wildcard),
+    // regardless of whether the folder is currently excluded from it.
+    public static FolderIconMapping FindMatchingMapping(string folderPath, string folderName)
+    {
+        string trimmedPath = folderPath.TrimEnd('/');
+
+        if (_iconsByPath.TryGetValue(trimmedPath, out FolderIconEntry pathEntry)) return pathEntry.SourceMapping;
+
+        if (_iconsByName.TryGetValue(folderName, out FolderIconEntry nameEntry)) return nameEntry.SourceMapping;
+
+        for (int i = 0; i < _iconsByNamePattern.Count; i++)
+        {
+            if (_iconsByNamePattern[i].Pattern.IsMatch(folderName))
+            {
+                return _iconsByNamePattern[i].Entry.SourceMapping;
+            }
+        }
+
+        return null;
+    }
+
     private static bool IsExcluded(FolderIconEntry entry, string folderPath)
     {
         if (entry.ExcludedFolderPaths == null || entry.ExcludedFolderPaths.Length == 0) return false;
@@ -203,7 +224,7 @@ public static class FolderIconLibrary
             ? mapping.excludeFolderPaths.Select(p => p.TrimEnd('/')).ToArray()
             : null;
 
-        var entry = new FolderIconEntry(mapping.ResolvedIcon, mapping.folderColor, excludedPaths);
+        var entry = new FolderIconEntry(mapping.ResolvedIcon, mapping.folderColor, excludedPaths, mapping);
 
         foreach (string folderName in mapping.folderNames)
         {

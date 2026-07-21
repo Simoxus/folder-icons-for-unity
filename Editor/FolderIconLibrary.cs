@@ -143,23 +143,6 @@ public static class FolderIconLibrary
             .ToArray();
     }
 
-    public static Texture2D[] GetCustomIcons()
-    {
-        string relative = FolderIcon.CUSTOM_ICONS_FOLDER_RELATIVE_PATH;
-        if (!AssetDatabase.IsValidFolder(relative)) return new Texture2D[0];
-
-        string absolute = Path.GetFullPath(relative).Replace('\\', '/');
-        if (!Directory.Exists(absolute)) return new Texture2D[0];
-
-        return Directory.GetFiles(absolute)
-            .Select(f => FolderIcon.ToProjectRelativePath(f.Replace('\\', '/')))
-            .Where(p => !string.IsNullOrEmpty(p))
-            .Select(AssetDatabase.LoadAssetAtPath<Texture2D>)
-            .Where(t => t != null)
-            .OrderBy(t => t.name)
-            .ToArray();
-    }
-
     public static Texture2D[] GetBuiltInIcons()
     {
         LoadBuiltInIcons();
@@ -200,6 +183,23 @@ public static class FolderIconLibrary
         {
             _cachedBuiltInIcons = System.Array.Empty<Texture2D>();
         }
+    }
+
+    public static Texture2D[] GetCustomIcons()
+    {
+        string relative = FolderIcon.CUSTOM_ICONS_FOLDER_RELATIVE_PATH;
+        if (!AssetDatabase.IsValidFolder(relative)) return new Texture2D[0];
+
+        string absolute = Path.GetFullPath(relative).Replace('\\', '/');
+        if (!Directory.Exists(absolute)) return new Texture2D[0];
+
+        return Directory.GetFiles(absolute)
+            .Select(f => FolderIcon.ToProjectRelativePath(f.Replace('\\', '/')))
+            .Where(p => !string.IsNullOrEmpty(p))
+            .Select(AssetDatabase.LoadAssetAtPath<Texture2D>)
+            .Where(t => t != null)
+            .OrderBy(t => t.name)
+            .ToArray();
     }
 
     private static void LoadMappingAssetsFromPackageIconsFolder()

@@ -6,10 +6,11 @@ using UnityEngine;
 public class FolderIconPaletteWindow : EditorWindow
 {
     private const float GRID_SCROLLBAR_WIDTH = 16f;
-    private const float CUSTOM_ICONS_SCROLL_HEIGHT = CELL_SIZE + 15f;
+    private const float BOTTOM_PADDING = 8f;
     private const float PACKAGE_ICONS_SCROLL_HEIGHT = 140f;
     private const float BUILT_IN_ICONS_SCROLL_HEIGHT = 140f;
-    private const float BOTTOM_PADDING = 8f;
+    private const float CUSTOM_ICONS_SCROLL_HEIGHT = CELL_SIZE + 15f;
+
     private const int ICON_COLUMNS = 5;
     private const float CELL_SIZE = 32f;
     private const float CELL_SPACING = 3f;
@@ -24,9 +25,6 @@ public class FolderIconPaletteWindow : EditorWindow
     private bool _usePath;
     private Color _folderColor = Color.white;
 
-    private Texture2D[] _customIcons;
-    private Vector2 _scrollCustom;
-
     private Texture2D[] _packageIcons;
     private string _packageSearch = string.Empty;
     private Texture2D _selectedPackageIcon;
@@ -35,8 +33,11 @@ public class FolderIconPaletteWindow : EditorWindow
     private string _builtInSearch = string.Empty;
     private string _selectedBuiltInIconName;
 
+    private Texture2D[] _customIcons;
+
     private Vector2 _scrollPackage;
     private Vector2 _scrollBuiltIn;
+    private Vector2 _scrollCustom;
 
     private double _pendingSaveTime = -1;
 
@@ -68,14 +69,14 @@ public class FolderIconPaletteWindow : EditorWindow
         var window = CreateInstance<FolderIconPaletteWindow>();
         window.Setup(folderPath);
 
-        // Rough initial estimate
+        // Element heights
         float estimatedHeight =
             8 + 20 + 6 + 20 + 6 + 18 + 6
-          + 18 + 2 + CUSTOM_ICONS_SCROLL_HEIGHT + 8
-          + 18 + 2 + PACKAGE_ICONS_SCROLL_HEIGHT + 40   // padding
+          + 18 + 2 + PACKAGE_ICONS_SCROLL_HEIGHT + 34   // padding
           + 8
-          + 18 + 2 + BUILT_IN_ICONS_SCROLL_HEIGHT + 40  // paddington
-          + 8;
+          + 18 + 2 + BUILT_IN_ICONS_SCROLL_HEIGHT + 34  // paddington
+          + 14
+          + CUSTOM_ICONS_SCROLL_HEIGHT + 8 + 18 + 20;
 
         window._minWindowHeight = estimatedHeight;
 
@@ -88,9 +89,9 @@ public class FolderIconPaletteWindow : EditorWindow
         _folderPath = folderPath;
         _folderName = Path.GetFileName(folderPath);
 
-        _customIcons = FolderIconLibrary.GetCustomIcons();
         _packageIcons = FolderIconLibrary.GetPackageIcons();
         _builtInIcons = FolderIconLibrary.GetBuiltInIcons();
+        _customIcons = FolderIconLibrary.GetCustomIcons();
 
         _mapping = FolderIconLibrary.FindMatchingMapping(_folderPath, _folderName);
 
@@ -153,31 +154,6 @@ public class FolderIconPaletteWindow : EditorWindow
 
                 GUILayout.Space(6);
 
-                bool customChanged = false;
-                EditorGUILayout.LabelField(new GUIContent("Custom Icons", "Icons placed directly in the Folder Icons settings folder."), EditorStyles.boldLabel);
-                GUILayout.Space(2);
-                if (_customIcons != null && _customIcons.Length > 0)
-                {
-                    using (new GUILayout.VerticalScope(EditorStyles.helpBox))
-                    {
-                        _scrollCustom = EditorGUILayout.BeginScrollView(
-                            _scrollCustom,
-                            alwaysShowHorizontal: true,
-                            alwaysShowVertical: false,
-                            horizontalScrollbar: GUI.skin.horizontalScrollbar,
-                            verticalScrollbar: GUIStyle.none,
-                            background: GUI.skin.scrollView,
-                            GUILayout.Height(CUSTOM_ICONS_SCROLL_HEIGHT));
-                        customChanged = DrawIconGrid(_customIcons, "No custom icons found.", isBuiltIn: false, maxColumns: int.MaxValue);
-                        EditorGUILayout.EndScrollView();
-                    }
-                }
-                else
-                {
-                    EditorGUILayout.HelpBox($"No custom icons found. Add some in {FolderIcon.CUSTOM_ICONS_FOLDER_RELATIVE_PATH}.", MessageType.Info);
-                }
-                GUILayout.Space(8);
-
                 EditorGUILayout.LabelField(new GUIContent("Package Icons", "Icons bundled with Folder Icons."), EditorStyles.boldLabel);
                 GUILayout.Space(2);
                 _packageSearch = EditorGUILayout.TextField(_packageSearch, EditorStyles.toolbarSearchField);
@@ -218,11 +194,37 @@ public class FolderIconPaletteWindow : EditorWindow
                     EditorGUILayout.EndScrollView();
                 }
 
-                bool iconChanged = packageChanged || builtInChanged || customChanged;
+                GUILayout.Space(8);
+
+                EditorGUILayout.LabelField(new GUIContent("Custom Icons", $"Icons placed directly in {FolderIcon.CUSTOM_ICONS_FOLDER_RELATIVE_PATH}."), EditorStyles.boldLabel);
+                GUILayout.Space(2);
+                bool customChanged = false;
+                using (new GUILayout.VerticalScope(EditorStyles.helpBox))
+                {
+                    if (_customIcons != null && _customIcons.Length > 0)
+                    {
+                        _scrollCustom = EditorGUILayout.BeginScrollView(
+                            _scrollCustom,
+                            alwaysShowHorizontal: true,
+                            alwaysShowVertical: false,
+                            horizontalScrollbar: GUI.skin.horizontalScrollbar,
+                            verticalScrollbar: GUIStyle.none,
+                            background: GUI.skin.scrollView,
+                            GUILayout.Height(CUSTOM_ICONS_SCROLL_HEIGHT));
+                        customChanged = DrawIconGrid(_customIcons, "No custom icons found.", isBuiltIn: false, maxColumns: int.MaxValue);
+                        EditorGUILayout.EndScrollView();
+                    }
+                    else
+                    {
+                        Rect helpBoxRect = GUILayoutUtility.GetRect(0, CUSTOM_ICONS_SCROLL_HEIGHT, GUILayout.ExpandWidth(true));
+                        EditorGUI.HelpBox(helpBoxRect, $"No custom icons found. Add some in {FolderIcon.CUSTOM_ICONS_FOLDER_RELATIVE_PATH}.", MessageType.Info);
+                    }
+                }
 
                 GUILayout.Space(8);
 
-                if ((boolsChanged || iconChanged))
+                bool iconChanged = packageChanged || builtInChanged || customChanged;
+                if ((iconChanged))
                 {
                     _pendingSaveTime = -1;
                     ApplyAndSave();
@@ -257,35 +259,37 @@ public class FolderIconPaletteWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
 
         // "None"
-        if (!isBuiltIn)
+        Rect noneCellRect = GUILayoutUtility.GetRect(CELL_SIZE, CELL_SIZE, GUILayout.Width(CELL_SIZE), GUILayout.Height(CELL_SIZE));
+        bool noneSelected = _selectedPackageIcon == null && _selectedBuiltInIconName == null;
+
+        if (noneSelected)
         {
-            Rect noneCellRect = GUILayoutUtility.GetRect(CELL_SIZE, CELL_SIZE, GUILayout.Width(CELL_SIZE), GUILayout.Height(CELL_SIZE));
-            bool noneSelected = _selectedPackageIcon == null && _selectedBuiltInIconName == null;
-
-            if (noneSelected)
-            {
-                Rect highlightRect = new Rect(noneCellRect.x + 1, noneCellRect.y + 1, noneCellRect.width - 2, noneCellRect.height - 2);
-                EditorGUI.DrawRect(highlightRect, new Color(0.24f, 0.48f, 0.90f, 0.35f));
-            }
-            else if (noneCellRect.Contains(Event.current.mousePosition))
-            {
-                EditorGUI.DrawRect(noneCellRect, new Color(1f, 1f, 1f, 0.06f));
-            }
-
-            GUI.Label(noneCellRect, new GUIContent("None", "No Icon"), EditorStyles.label);
-
-            if (Event.current.type == EventType.MouseDown && noneCellRect.Contains(Event.current.mousePosition))
-            {
-                _selectedPackageIcon = null;
-                _selectedBuiltInIconName = null;
-                changed = true;
-                Event.current.Use();
-                Repaint();
-            }
-
-            GUILayout.Space(CELL_SPACING);
-            column++;
+            Rect highlightRect = new Rect(noneCellRect.x + 1, noneCellRect.y + 1, noneCellRect.width - 2, noneCellRect.height - 2);
+            EditorGUI.DrawRect(highlightRect, new Color(0.24f, 0.48f, 0.90f, 0.35f));
         }
+        else if (noneCellRect.Contains(Event.current.mousePosition))
+        {
+            EditorGUI.DrawRect(noneCellRect, new Color(1f, 1f, 1f, 0.06f));
+        }
+
+        var noneLabelStyle = new GUIStyle(EditorStyles.miniLabel)
+        {
+            alignment = TextAnchor.MiddleCenter
+        };
+        Rect paddedTextRect = new Rect(noneCellRect.x + 2, noneCellRect.y, noneCellRect.width - 4, noneCellRect.height);
+        GUI.Label(paddedTextRect, new GUIContent("None", "No Icon"), noneLabelStyle);
+
+        if (Event.current.type == EventType.MouseDown && noneCellRect.Contains(Event.current.mousePosition))
+        {
+            _selectedPackageIcon = null;
+            _selectedBuiltInIconName = null;
+            changed = true;
+            Event.current.Use();
+            Repaint();
+        }
+
+        GUILayout.Space(CELL_SPACING);
+        column++;
 
         if (icons == null || icons.Length == 0)
         {

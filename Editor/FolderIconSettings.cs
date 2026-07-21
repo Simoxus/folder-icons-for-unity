@@ -5,6 +5,10 @@ public static class FolderIconSettings
 {
     private const string PREFIX = "FolderIcon.";
 
+    // Behavior
+    private const string ENABLED_KEY = PREFIX + "Enabled";
+    private const string MAX_MATCH_DEPTH_KEY = PREFIX + "MaxMatchDepth";
+
     // Row Decorations
     private const string CLEARER_ROWS_ENABLED_KEY = PREFIX + "ClearerRowsEnabled";
     private const string CLEARER_ROWS_BACKGROUND_LIGHT_KEY = PREFIX + "ClearerRowsBackgroundLight";
@@ -35,6 +39,18 @@ public static class FolderIconSettings
     private const string SIZE_STEP_KEY = PREFIX + "SizeStep";
     private const string MIN_LARGE_SIZE_KEY = PREFIX + "MinLargeSize";
     private const string MAX_LARGE_SIZE_KEY = PREFIX + "MaxLargeSize";
+
+    public static bool Enabled
+    {
+        get => EditorPrefs.GetBool(ENABLED_KEY, true);
+        set => EditorPrefs.SetBool(ENABLED_KEY, value);
+    }
+
+    public static int MaxMatchDepth
+    {
+        get => EditorPrefs.GetInt(MAX_MATCH_DEPTH_KEY, 0);
+        set => EditorPrefs.SetInt(MAX_MATCH_DEPTH_KEY, value);
+    }
 
     public static bool ClearerRowsEnabled
     {

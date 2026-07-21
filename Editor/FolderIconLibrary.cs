@@ -44,6 +44,13 @@ public static class FolderIconLibrary
     {
         if (_iconsByPath.TryGetValue(folderPath, out entry)) return true;
 
+        int maxDepth = FolderIconSettings.MaxMatchDepth;
+        if (maxDepth > 0 && GetFolderDepth(folderPath) > maxDepth)
+        {
+            entry = default;
+            return false;
+        }
+
         if (_iconsByName.TryGetValue(folderName, out entry))
         {
             return !IsExcluded(entry, folderPath);
@@ -59,6 +66,17 @@ public static class FolderIconLibrary
 
         entry = default;
         return false;
+    }
+
+    // "Assets" itself is depth 0; "Assets/Foo" is depth 1; "Assets/Foo/Bar" is depth 2, etc.
+    private static int GetFolderDepth(string folderPath)
+    {
+        int depth = 0;
+        for (int i = 0; i < folderPath.Length; i++)
+        {
+            if (folderPath[i] == '/') depth++;
+        }
+        return depth;
     }
 
     // Finds the mapping asset that would match this folder (by path, name, or wildcard),

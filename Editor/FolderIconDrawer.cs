@@ -31,6 +31,7 @@ public static class FolderIconDrawer
 
     private static void DrawFolderIcon(string guid, Rect rect)
     {
+        if (!FolderIconSettings.Enabled) return;
         if (Event.current.type != EventType.Repaint) return;
 
         string path = AssetDatabase.GUIDToAssetPath(guid);

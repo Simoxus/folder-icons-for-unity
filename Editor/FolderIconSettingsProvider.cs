@@ -21,6 +21,16 @@ internal static class FolderIconSettingsProvider
 
                         EditorGUI.BeginChangeCheck();
 
+                        EditorGUILayout.LabelField("Behavior", EditorStyles.boldLabel);
+                        FolderIconSettings.Enabled = EditorGUILayout.Toggle(new GUIContent("Enabled"), FolderIconSettings.Enabled);
+                        FolderIconSettings.MaxMatchDepth = EditorGUILayout.IntSlider(
+                            new GUIContent("Max Match Depth", "How many folders deep mappings will search to apply icons.\n0 = unlimited. Explicit path mappings always apply."),
+                            FolderIconSettings.MaxMatchDepth, 0, 20
+
+                        );
+
+                        EditorGUILayout.Space(8);
+
                         EditorGUILayout.LabelField("Row Decorations", EditorStyles.boldLabel);
                         FolderIconSettings.ClearerRowsEnabled = EditorGUILayout.Toggle(
                             new GUIContent("Clearer Rows", "Removes the folder icon from the tree view in the Project window. Slightly scuffed! (no reflection yet :P)"),

@@ -12,6 +12,7 @@ public static class FolderIconRowDecorator
 
     private static void DrawDecorations(string guid, Rect rowRect)
     {
+        if (!FolderIconSettings.Enabled) return;
         if (Event.current.type != EventType.Repaint) return;
         if (rowRect.height > 20f) return; // Only meaningful in list/tree view
 

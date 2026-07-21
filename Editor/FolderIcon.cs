@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 public static class FolderIcon
 {
@@ -40,10 +41,22 @@ public static class FolderIcon
 
     public static string ToProjectRelativePath(string absolutePath)
     {
+        if (string.IsNullOrEmpty(absolutePath)) return null;
+
+        string normalized = absolutePath.Replace('\\', '/').TrimEnd('/');
+
+        foreach (PackageInfo package in PackageInfo.GetAllRegisteredPackages())
+        {
+            string resolvedPath = package.resolvedPath.Replace('\\', '/').TrimEnd('/');
+            if (!normalized.StartsWith(resolvedPath, StringComparison.OrdinalIgnoreCase)) continue;
+
+            string remainder = normalized.Substring(resolvedPath.Length).TrimStart('/');
+            return string.IsNullOrEmpty(remainder) ? package.assetPath : $"{package.assetPath}/{remainder}";
+        }
+
         string dataPath = Application.dataPath; // Assets
         string projectRoot = dataPath.Substring(0, dataPath.Length - "Assets".Length);
 
-        string normalized = absolutePath.Replace('\\', '/');
         return normalized.StartsWith(projectRoot) ? normalized.Substring(projectRoot.Length) : null;
     }
 

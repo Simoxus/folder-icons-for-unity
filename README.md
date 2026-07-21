@@ -14,7 +14,7 @@
   </tr>
 </table>
 
-Customize your Project Browser with color and icons. Never open the wrong folder again!
+Customize your Unity project hierarchy with colors and icons.
 
 ---
 

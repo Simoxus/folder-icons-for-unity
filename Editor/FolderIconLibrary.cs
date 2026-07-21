@@ -45,7 +45,7 @@ public static class FolderIconLibrary
 
     public static Texture2D[] GetPackageIcons()
     {
-        string relative = FolderIcon.ToProjectRelativePath(IconsFolderAbsolute);
+        string relative = FolderIcon.GetPackageIconsFolderAssetPath();
 
         if (string.IsNullOrEmpty(relative) || !AssetDatabase.IsValidFolder(relative))
         {
@@ -103,12 +103,15 @@ public static class FolderIconLibrary
 
     private static void LoadMappingAssetsFromPackageIconsFolder()
     {
-        if (!Directory.Exists(IconsFolderAbsolute)) return;
+        string absoluteFolder = IconsFolderAbsolute;
+        string assetFolder = FolderIcon.GetPackageIconsFolderAssetPath();
 
-        foreach (string file in Directory.GetFiles(IconsFolderAbsolute, "*.asset"))
+        if (string.IsNullOrEmpty(absoluteFolder) || string.IsNullOrEmpty(assetFolder)) return;
+        if (!Directory.Exists(absoluteFolder)) return;
+
+        foreach (string file in Directory.GetFiles(absoluteFolder, "*.asset"))
         {
-            string relativePath = FolderIcon.ToProjectRelativePath(file);
-            if (relativePath == null) continue;
+            string relativePath = $"{assetFolder}/{Path.GetFileName(file)}";
 
             var mapping = AssetDatabase.LoadAssetAtPath<FolderIconMapping>(relativePath);
             if (mapping == null) continue;

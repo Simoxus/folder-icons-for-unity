@@ -28,15 +28,29 @@ public static class FolderIcon
         return SETTINGS_FOLDER_RELATIVE_PATH;
     }
 
-    public static string GetPackageFolder([CallerFilePath] string callerPath = null)
+    public static string GetPackageAssetPath([CallerFilePath] string callerPath = null)
     {
+        PackageInfo packageInfo = PackageInfo.FindForAssembly(typeof(FolderIcon).Assembly);
+        if (packageInfo != null) return packageInfo.assetPath;
+
         string scriptFolder = Path.GetDirectoryName(callerPath)?.Replace('\\', '/');
-        return Path.GetDirectoryName(scriptFolder)?.Replace('\\', '/');
+        string packageFolder = Path.GetDirectoryName(scriptFolder)?.Replace('\\', '/');
+        return ToProjectRelativePath(packageFolder);
     }
 
+    // The bundled icons folder, as a Unity asset path
+    public static string GetPackageIconsFolderAssetPath()
+    {
+        string packagePath = GetPackageAssetPath();
+        return string.IsNullOrEmpty(packagePath) ? null : $"{packagePath}/Internal";
+    }
+
+    // The bundled icons folder
     public static string GetPackageIconsFolder()
     {
-        return $"{GetPackageFolder()}/Internal";
+        string assetPath = GetPackageIconsFolderAssetPath();
+        if (string.IsNullOrEmpty(assetPath)) return null;
+        return Path.GetFullPath(assetPath).Replace('\\', '/');
     }
 
     public static string ToProjectRelativePath(string absolutePath)
@@ -44,16 +58,6 @@ public static class FolderIcon
         if (string.IsNullOrEmpty(absolutePath)) return null;
 
         string normalized = absolutePath.Replace('\\', '/').TrimEnd('/');
-
-        foreach (PackageInfo package in PackageInfo.GetAllRegisteredPackages())
-        {
-            string resolvedPath = package.resolvedPath.Replace('\\', '/').TrimEnd('/');
-            if (!normalized.StartsWith(resolvedPath, StringComparison.OrdinalIgnoreCase)) continue;
-
-            string remainder = normalized.Substring(resolvedPath.Length).TrimStart('/');
-            return string.IsNullOrEmpty(remainder) ? package.assetPath : $"{package.assetPath}/{remainder}";
-        }
-
         string dataPath = Application.dataPath; // Assets
         string projectRoot = dataPath.Substring(0, dataPath.Length - "Assets".Length);
 
@@ -103,7 +107,7 @@ public static class FolderIcon
     public static Texture2D ResolveBaseIcon(bool isEmpty)
     {
         string targetName = isEmpty ? "FolderEmpty Icon" : "Folder Icon";
-        string relative = ToProjectRelativePath(GetPackageIconsFolder());
+        string relative = GetPackageIconsFolderAssetPath();
 
         if (!string.IsNullOrEmpty(relative) && AssetDatabase.IsValidFolder(relative))
         {

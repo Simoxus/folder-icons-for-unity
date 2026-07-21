@@ -23,6 +23,7 @@ internal static class FolderIconSettingsProvider
 
                         EditorGUILayout.LabelField("Behavior", EditorStyles.boldLabel);
                         FolderIconSettings.Enabled = EditorGUILayout.Toggle(new GUIContent("Enabled"), FolderIconSettings.Enabled);
+                        EditorGUI.BeginDisabledGroup(!FolderIconSettings.Enabled);
                         FolderIconSettings.MaxMatchDepth = EditorGUILayout.IntSlider(
                             new GUIContent("Max Match Depth", "How many folders deep mappings will search to apply icons.\n0 = unlimited. Explicit path mappings always apply."),
                             FolderIconSettings.MaxMatchDepth, 0, 20
@@ -90,6 +91,8 @@ internal static class FolderIconSettingsProvider
                         );
                         FolderIconSettings.MinLargeSize = EditorGUILayout.IntSlider("Min Large Size", FolderIconSettings.MinLargeSize, 8, 128);
                         FolderIconSettings.MaxLargeSize = EditorGUILayout.IntSlider("Max Large Size", FolderIconSettings.MaxLargeSize, 64, 512);
+
+                        EditorGUI.EndDisabledGroup();
 
                         if (EditorGUI.EndChangeCheck())
                         {

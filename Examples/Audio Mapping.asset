@@ -14,8 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: 5c6bdd9cbc2e3a14f995f177d2d128dc, type: 3}
   builtInIconName: 
-  colorFolderIcon: 0
-  folderIconColor: {r: 1, g: 1, b: 1, a: 1}
+  folderColor: {r: 1, g: 1, b: 1, a: 1}
   folderNames:
   - Audio
   folderPaths:

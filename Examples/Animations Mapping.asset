@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22e5ef04214d3e041acf1b1a0d305d5a, type: 3}
-  m_Name: _UI Mapping
+  m_Name: Animations Mapping
   m_EditorClassIdentifier: 
-  icon: {fileID: 2800000, guid: fd36a846d12b9b24ab3f15dd7241a901, type: 3}
+  icon: {fileID: 2800000, guid: 205716ef7aa728b48a1689e9e7bc4e8d, type: 3}
   builtInIconName: 
   folderColor: {r: 1, g: 1, b: 1, a: 1}
-  folderNames: []
+  folderNames:
+  - Animations
   folderPaths:
-  - Assets/_Project/UI
-  - Assets/_Project/_UI
+  - Assets/_Project/NPCs/Humans/Guard/Animations

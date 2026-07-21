@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Materials Mapping
   m_EditorClassIdentifier: 
   icon: {fileID: 2800000, guid: 466a1cc7233aab94fa880fb9d8a926c3, type: 3}
-  tintDefaultIcon: 0
-  defaultIconTint: {r: 1, g: 1, b: 1, a: 1}
-  folderNames: []
+  builtInIconName: 
+  folderColor: {r: 1, g: 1, b: 1, a: 1}
+  folderNames:
+  - Materials
   folderPaths:
   - Assets/_Project/Materials
+  - Assets/_Project/NPCs/Humans/Guard/Materials

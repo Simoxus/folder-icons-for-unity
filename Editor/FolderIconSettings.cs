@@ -72,7 +72,7 @@ public static class FolderIconSettings
 
     public static bool ZebraStripingEnabled
     {
-        get => EditorPrefs.GetBool(ZEBRA_STRIPING_ENABLED_KEY, true);
+        get => EditorPrefs.GetBool(ZEBRA_STRIPING_ENABLED_KEY, false);
         set => EditorPrefs.SetBool(ZEBRA_STRIPING_ENABLED_KEY, value);
     }
 

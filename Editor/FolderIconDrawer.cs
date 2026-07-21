@@ -15,6 +15,8 @@ public static class FolderIconDrawer
     private static readonly HashSet<IconCacheKey> _pendingKeys = new HashSet<IconCacheKey>();
     private static readonly Stopwatch _budgetStopwatch = new Stopwatch();
 
+    private static readonly Dictionary<string, bool> _emptyFolderCache = new Dictionary<string, bool>(StringComparer.Ordinal);
+
     static FolderIconDrawer()
     {
         EditorApplication.projectWindowItemOnGUI -= DrawFolderIcon;
@@ -39,7 +41,7 @@ public static class FolderIconDrawer
 
         bool isSmallRow = rect.height <= 20f; // list view vs tile view
         int size = isSmallRow ? 16 : FolderIcon.GetQuantizedLargeSize(rect);
-        bool isEmpty = FolderIcon.IsFolderEmpty(path);
+        bool isEmpty = IsFolderEmptyCached(path);
 
         var cacheKey = new IconCacheKey(path, size, isEmpty);
 
@@ -61,13 +63,21 @@ public static class FolderIconDrawer
 
         if (FolderIconSettings.ClearerRowsEnabled && isSmallRow)
         {
-            int instanceId = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path).GetInstanceID();
-            bool isSelected = Selection.instanceIDs.Contains(instanceId);
+            bool isSelected = Selection.assetGUIDs.Contains(guid);
 
             EditorGUI.DrawRect(iconRect, FolderIcon.GetRowBackgroundColor(rect, isSelected));
         }
 
         GUI.DrawTexture(iconRect, composited);
+    }
+
+    private static bool IsFolderEmptyCached(string path)
+    {
+        if (_emptyFolderCache.TryGetValue(path, out bool isEmpty)) return isEmpty;
+
+        isEmpty = FolderIcon.IsFolderEmpty(path);
+        _emptyFolderCache[path] = isEmpty;
+        return isEmpty;
     }
 
     private static void ProcessGenerationQueue()
@@ -107,11 +117,53 @@ public static class FolderIconDrawer
         }
     }
 
+    private sealed class CacheInvalidator : AssetPostprocessor
+    {
+        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+        {
+            if (deletedAssets.Length == 0 && movedFromAssetPaths.Length == 0) return;
+
+            _emptyFolderCache.Clear();
+            RemoveStaleEntries(deletedAssets);
+            RemoveStaleEntries(movedFromAssetPaths);
+        }
+    }
+
+    private static void RemoveStaleEntries(string[] paths)
+    {
+        if (paths == null || paths.Length == 0) return;
+
+        List<IconCacheKey> staleKeys = null;
+
+        foreach (KeyValuePair<IconCacheKey, Texture2D> pair in _compositedIcons)
+        {
+            for (int i = 0; i < paths.Length; i++)
+            {
+                if (string.Equals(pair.Key.Path, paths[i], StringComparison.Ordinal))
+                {
+                    (staleKeys ??= new List<IconCacheKey>()).Add(pair.Key);
+                    break;
+                }
+            }
+        }
+
+        if (staleKeys == null) return;
+
+        foreach (IconCacheKey key in staleKeys)
+        {
+            DestroyIfOwned(_compositedIcons[key]);
+            _compositedIcons.Remove(key);
+            _pendingKeys.Remove(key);
+        }
+    }
+
     private readonly struct IconCacheKey : IEquatable<IconCacheKey>
     {
         private readonly string _path;
         private readonly int _size;
         private readonly bool _isEmpty;
+
+        public string Path => _path;
 
         public IconCacheKey(string path, int size, bool isEmpty)
         {

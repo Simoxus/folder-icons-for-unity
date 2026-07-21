@@ -77,12 +77,16 @@ public class FolderIconMappingEditor : Editor
                 }
             }
 
+            bool removed = false;
             if (GUILayout.Button("-", GUILayout.Width(20)))
             {
                 _folderPaths.DeleteArrayElementAtIndex(i);
+                removed = true;
             }
 
             EditorGUILayout.EndHorizontal();
+
+            if (removed) break;
         }
 
         if (GUILayout.Button("+", GUILayout.Width(20)))

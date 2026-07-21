@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -72,11 +71,12 @@ public static class FolderIconLibrary
 
         try
         {
-            var method = typeof(EditorGUIUtility).GetMethod(
-                "GetEditorAssetBundle",
-                BindingFlags.NonPublic | BindingFlags.Static);
-
-            var bundle = (AssetBundle)method.Invoke(null, null);
+            var bundle = FolderIcon.GetEditorAssetBundle();
+            if (bundle == null)
+            {
+                _cachedBuiltInIcons = System.Array.Empty<Texture2D>();
+                return;
+            }
 
             var packageIconNames = new HashSet<string>(
                 GetPackageIcons().Select(t => "d_" + t.name),

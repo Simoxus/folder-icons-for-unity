@@ -79,8 +79,8 @@ public static class FolderIcon
         }
 
         return EditorGUIUtility.isProSkin
-            ? new Color32(56, 56, 56, 255)
-            : new Color32(200, 200, 200, 255);
+            ? FolderIconSettings.ClearerRowsBackgroundDark
+            : FolderIconSettings.ClearerRowsBackgroundLight;
     }
 
     public static int GetQuantizedLargeSize(Rect cellRect)
@@ -125,6 +125,29 @@ public static class FolderIcon
         return EditorGUIUtility.FindTexture(targetName);
     }
 
+    private static AssetBundle _cachedEditorAssetBundle;
+    private static System.Reflection.MethodInfo _getEditorAssetBundleMethod;
+
+    public static AssetBundle GetEditorAssetBundle()
+    {
+        if (_cachedEditorAssetBundle != null) return _cachedEditorAssetBundle;
+
+        try
+        {
+            _getEditorAssetBundleMethod ??= typeof(EditorGUIUtility).GetMethod(
+                "GetEditorAssetBundle",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+
+            _cachedEditorAssetBundle = (AssetBundle)_getEditorAssetBundleMethod.Invoke(null, null);
+        }
+        catch
+        {
+            _cachedEditorAssetBundle = null;
+        }
+
+        return _cachedEditorAssetBundle;
+    }
+
     public static Texture2D ResolveBuiltInIcon(string iconName)
     {
         if (string.IsNullOrEmpty(iconName)) return null;
@@ -132,14 +155,11 @@ public static class FolderIcon
         Texture2D found = EditorGUIUtility.FindTexture(iconName);
         if (found != null) return found;
 
+        AssetBundle bundle = GetEditorAssetBundle();
+        if (bundle == null) return null;
+
         try
         {
-            var method = typeof(EditorGUIUtility).GetMethod(
-                "GetEditorAssetBundle",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-
-            var bundle = (AssetBundle)method.Invoke(null, null);
-
             string path = Array.Find(bundle.GetAllAssetNames(),
                 n => Path.GetFileNameWithoutExtension(n) == iconName);
 

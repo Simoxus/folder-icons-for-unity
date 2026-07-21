@@ -18,4 +18,5 @@ MonoBehaviour:
   folderNames:
   - '*Editor*'
   folderPaths: []
-  excludeFolderPaths: []
+  excludeFolderPaths:
+  - Assets/Plugins/Internal/EditorDarkMode

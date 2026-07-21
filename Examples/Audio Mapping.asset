@@ -19,3 +19,5 @@ MonoBehaviour:
   - Audio
   folderPaths:
   - Assets/_Project/Audio
+  excludeFolderPaths:
+  - Assets/_Project/_Core/GameSettings/Audio

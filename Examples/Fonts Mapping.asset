@@ -10,14 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22e5ef04214d3e041acf1b1a0d305d5a, type: 3}
-  m_Name: Controls Mapping
+  m_Name: Fonts Mapping
   m_EditorClassIdentifier: 
-  icon: {fileID: 2800000, guid: c8b72fa174479a642ad6bbacbcb41bc2, type: 3}
+  icon: {fileID: 2800000, guid: dacb57428c6a4ab4caf7722433e4f7b0, type: 3}
   builtInIconName: 
   folderColor: {r: 1, g: 1, b: 1, a: 1}
   folderNames:
-  - Controls
-  - InputSystem
+  - Fonts
   folderPaths: []
-  excludeFolderPaths:
-  - Assets/_Project/_Core/GameSettings/Controls
+  excludeFolderPaths: []

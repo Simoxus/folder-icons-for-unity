@@ -18,3 +18,4 @@ MonoBehaviour:
   folderNames:
   - Data
   folderPaths: []
+  excludeFolderPaths: []

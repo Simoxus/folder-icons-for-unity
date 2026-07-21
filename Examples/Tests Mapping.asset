@@ -19,4 +19,5 @@ MonoBehaviour:
   - '*Tests*'
   - '*Test*'
   folderPaths: []
-  excludeFolderPaths: []
+  excludeFolderPaths:
+  - Assets/_Project/Rooms/LightContainment/lcz-testchamber

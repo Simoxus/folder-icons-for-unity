@@ -11,6 +11,8 @@ public static class FolderIcon
 {
     public const string SETTINGS_PARENT_RELATIVE_PATH = "Assets/Settings";
     public const string SETTINGS_FOLDER_RELATIVE_PATH = SETTINGS_PARENT_RELATIVE_PATH + "/Folder Icons";
+    public const string MAPS_FOLDER_RELATIVE_PATH = SETTINGS_FOLDER_RELATIVE_PATH;
+    public const string CUSTOM_ICONS_FOLDER_RELATIVE_PATH = SETTINGS_FOLDER_RELATIVE_PATH + "/Custom";
     public const float GENERATION_BUDGET_MILLISECONDS = 2;
 
     public static string EnsureSettingsFolderExists()
@@ -25,7 +27,12 @@ public static class FolderIcon
             AssetDatabase.CreateFolder(SETTINGS_PARENT_RELATIVE_PATH, "Folder Icons");
         }
 
-        return SETTINGS_FOLDER_RELATIVE_PATH;
+        if (!AssetDatabase.IsValidFolder(CUSTOM_ICONS_FOLDER_RELATIVE_PATH))
+        {
+            AssetDatabase.CreateFolder(SETTINGS_FOLDER_RELATIVE_PATH, "Custom");
+        }
+
+        return MAPS_FOLDER_RELATIVE_PATH;
     }
 
     public static string GetPackageAssetPath([CallerFilePath] string callerPath = null)

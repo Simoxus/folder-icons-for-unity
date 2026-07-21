@@ -5,12 +5,14 @@ public readonly struct FolderIconEntry
 {
     public readonly Texture2D Icon;
     public readonly Color FolderColor;
+    public readonly string[] ExcludedFolderPaths;
 
     public bool HasFolderColor => FolderColor != Color.white;
 
-    public FolderIconEntry(Texture2D icon, Color folderColor = default)
+    public FolderIconEntry(Texture2D icon, Color folderColor = default, string[] excludedFolderPaths = null)
     {
         Icon = icon;
         FolderColor = folderColor == default ? Color.white : folderColor;
+        ExcludedFolderPaths = excludedFolderPaths;
     }
 }

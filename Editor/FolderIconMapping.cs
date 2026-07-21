@@ -10,8 +10,15 @@ public class FolderIconMapping : ScriptableObject
 
     public List<string> folderNames = new List<string>();
     public List<string> folderPaths = new List<string>();
+    public List<string> excludeFolderPaths = new List<string>();
 
     public Texture2D ResolvedIcon => icon != null ? icon : FolderIcon.ResolveBuiltInIcon(builtInIconName);
+
+    [ContextMenu("Rebuild Icons")]
+    public void Rebuild()
+    {
+        FolderIconLibrary.Rebuild();
+    }
 
     private void OnValidate()
     {

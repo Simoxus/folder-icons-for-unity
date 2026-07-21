@@ -6,6 +6,7 @@ using UnityEngine;
 public class FolderIconPaletteWindow : EditorWindow
 {
     private const float GRID_SCROLLBAR_WIDTH = 16f;
+    private const float CUSTOM_ICONS_SCROLL_HEIGHT = CELL_SIZE + 15f;
     private const float PACKAGE_ICONS_SCROLL_HEIGHT = 140f;
     private const float BUILT_IN_ICONS_SCROLL_HEIGHT = 140f;
     private const float BOTTOM_PADDING = 8f;
@@ -22,6 +23,9 @@ public class FolderIconPaletteWindow : EditorWindow
 
     private bool _usePath;
     private Color _folderColor = Color.white;
+
+    private Texture2D[] _customIcons;
+    private Vector2 _scrollCustom;
 
     private Texture2D[] _packageIcons;
     private string _packageSearch = string.Empty;
@@ -67,9 +71,10 @@ public class FolderIconPaletteWindow : EditorWindow
         // Rough initial estimate
         float estimatedHeight =
             8 + 20 + 6 + 20 + 6 + 18 + 6
-          + 18 + 2 + PACKAGE_ICONS_SCROLL_HEIGHT + 30   // padding
+          + 18 + 2 + CUSTOM_ICONS_SCROLL_HEIGHT + 8
+          + 18 + 2 + PACKAGE_ICONS_SCROLL_HEIGHT + 40   // padding
           + 8
-          + 18 + 2 + BUILT_IN_ICONS_SCROLL_HEIGHT + 30  // paddington
+          + 18 + 2 + BUILT_IN_ICONS_SCROLL_HEIGHT + 40  // paddington
           + 8;
 
         window._minWindowHeight = estimatedHeight;
@@ -83,6 +88,7 @@ public class FolderIconPaletteWindow : EditorWindow
         _folderPath = folderPath;
         _folderName = Path.GetFileName(folderPath);
 
+        _customIcons = FolderIconLibrary.GetCustomIcons();
         _packageIcons = FolderIconLibrary.GetPackageIcons();
         _builtInIcons = FolderIconLibrary.GetBuiltInIcons();
 
@@ -152,7 +158,41 @@ public class FolderIconPaletteWindow : EditorWindow
                     _usePath);
                 bool boolsChanged = EditorGUI.EndChangeCheck();
 
+                if (!_usePath && _mapping != null)
+                {
+                    if (GUILayout.Button(new GUIContent("Exclude Folder from Mapping",
+                        "Prevents this specific folder from getting the icon, even though it matches by name.")))
+                    {
+                        ExcludeFolderFromMapping();
+                    }
+                }
+
                 GUILayout.Space(6);
+
+                bool customChanged = false;
+                EditorGUILayout.LabelField(new GUIContent("Custom Icons", "Icons placed directly in the Folder Icons settings folder."), EditorStyles.boldLabel);
+                GUILayout.Space(2);
+                if (_customIcons != null && _customIcons.Length > 0)
+                {
+                    using (new GUILayout.VerticalScope(EditorStyles.helpBox))
+                    {
+                        _scrollCustom = EditorGUILayout.BeginScrollView(
+                            _scrollCustom,
+                            alwaysShowHorizontal: true,
+                            alwaysShowVertical: false,
+                            horizontalScrollbar: GUI.skin.horizontalScrollbar,
+                            verticalScrollbar: GUIStyle.none,
+                            background: GUI.skin.scrollView,
+                            GUILayout.Height(CUSTOM_ICONS_SCROLL_HEIGHT));
+                        customChanged = DrawIconGrid(_customIcons, "No custom icons found.", isBuiltIn: false, maxColumns: int.MaxValue);
+                        EditorGUILayout.EndScrollView();
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox($"No custom icons found. Add some in {FolderIcon.CUSTOM_ICONS_FOLDER_RELATIVE_PATH}.", MessageType.Info);
+                }
+                GUILayout.Space(8);
 
                 EditorGUILayout.LabelField(new GUIContent("Package Icons", "Icons bundled with Folder Icons."), EditorStyles.boldLabel);
                 GUILayout.Space(2);
@@ -194,7 +234,7 @@ public class FolderIconPaletteWindow : EditorWindow
                     EditorGUILayout.EndScrollView();
                 }
 
-                bool iconChanged = packageChanged || builtInChanged;
+                bool iconChanged = packageChanged || builtInChanged || customChanged;
 
                 GUILayout.Space(8);
 
@@ -226,7 +266,7 @@ public class FolderIconPaletteWindow : EditorWindow
     }
 
     // Returns true if the selection changed this frame
-    private bool DrawIconGrid(Texture2D[] icons, string emptyMessage, bool isBuiltIn)
+    private bool DrawIconGrid(Texture2D[] icons, string emptyMessage, bool isBuiltIn, int maxColumns = ICON_COLUMNS)
     {
         bool changed = false;
         int column = 0;
@@ -272,7 +312,7 @@ public class FolderIconPaletteWindow : EditorWindow
 
         foreach (Texture2D icon in icons)
         {
-            if (column >= ICON_COLUMNS)
+            if (column >= maxColumns)
             {
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.BeginHorizontal();
@@ -323,8 +363,29 @@ public class FolderIconPaletteWindow : EditorWindow
             .ToArray();
     }
 
+    private void ExcludeFolderFromMapping()
+    {
+        if (_mapping == null) return;
+
+        if (!_mapping.excludeFolderPaths.Contains(_folderPath))
+        {
+            _mapping.excludeFolderPaths.Add(_folderPath);
+        }
+
+        EditorUtility.SetDirty(_mapping);
+        AssetDatabase.SaveAssets();
+
+        FolderIconLibrary.Rebuild();
+        Close();
+    }
+
     private void ApplyAndSave()
     {
+        if (_mapping == null && _selectedPackageIcon == null && _selectedBuiltInIconName == null && _folderColor == Color.white)
+        {
+            return;
+        }
+
         if (_mapping == null)
         {
             _mapping = CreateInstance<FolderIconMapping>();
